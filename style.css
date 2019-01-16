@@ -1,0 +1,42 @@
+body {
+    text-align: center;
+}
+
+
+h1,
+h2 {
+    font-family: monospace;
+    font-style: italic;
+}
+
+button {
+    border: none;
+    border-collapse: collapse;
+    border-radius: 7px;
+    outline: none;
+    background: blue;
+    cursor: pointer;
+    color: aliceblue;
+    font-size: 28px;
+    font-weight: 600;
+    width: 40%;
+    margin: 50px 0;
+    text-align: left;
+    padding: 5px;
+}
+
+table {
+    border: 3px solid gray;
+    width: 80%;
+    margin: 0 auto;
+}
+
+thead {
+    font-weight: 600;
+    font-size: 18px;
+    background: cadetblue;
+}
+
+td {
+    border: 1px solid gray;
+}
