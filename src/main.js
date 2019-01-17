@@ -26,7 +26,7 @@ function statusInRussian(status) {
             status = "Совершил посадку";
             break;
         case "scheduled":
-            status = "Согласно расписанию";
+            status = "Совершил посадку"; //to add time to func getArrival
             break;
         case "cancelled":
             status = "Отменен";
