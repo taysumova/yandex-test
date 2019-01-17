@@ -1,12 +1,42 @@
 body {
     text-align: center;
+    background: url(img/bgimage.jpg) no-repeat;
+    background-size: cover;
+    min-width: 1125px;
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
 
 h1,
-h2 {
+h2,
+p {
     font-family: monospace;
     font-style: italic;
+    color: midnightblue;
+}
+
+
+p {
+    font-size: 28px;
+}
+
+#input {
+    background-image: url(img/icon-search.svg);
+    background-repeat: no-repeat;
+    background-position: 5px 5px;
+    background-color: #fff;
+    border-radius: 7px;
+    width: 40%;
+    padding: 10px 10px 10px 40px;
+    font-size: 18px;
+}
+
+#submit {
+    border-radius: 7px;
+    font-size: 18px;
+    padding: 10px;
+    cursor: pointer;
 }
 
 button {
@@ -19,19 +49,40 @@ button {
     color: aliceblue;
     font-size: 28px;
     font-weight: 600;
-    width: 40%;
-    margin: 50px 0;
+    width: 29%;
     text-align: left;
-    padding: 5px;
+    padding: 5px 15px;
+}
+
+button:hover {
+    color: blue;
+    background-color: lightgray;
+}
+
+.button-active {
+    color: blue;
+    background-color: aliceblue;
+}
+
+.wrapper {
+    width: 100%;
+    margin-top: 40px;
 }
 
 table {
-    border: 3px solid gray;
-    width: 80%;
-    margin: 0 auto;
+    width: 90%;
+    margin: 20px auto;
+    color: darkblue;
 }
 
-thead {
+#timeTable,
+#delaysTable {
+    display: none;
+}
+
+thead td {
+    border: 2px solid gray;
+    border-radius: 7px;
     font-weight: 600;
     font-size: 18px;
     background: cadetblue;

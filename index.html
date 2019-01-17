@@ -5,17 +5,22 @@
     <meta charset="UTF-8">
     <title>Airport Timetable</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="img/logo.png">
 </head>
 
 <body>
     <h1>Аэропорт Шереметьево</h1>
     <h2>Табло рейсов</h2>
-    <input id="input" type="search" placeholder="Number of flight">
-    <input id="submit" type="submit" value="Search">
-    <div id="responseField" height="40" width="40" backgroundColor="blue"></div>
-    <button id="departure">Вылет</button>
-    <button id="arrival">Прилет</button>
-    <table id="departureTable">
+    <div class="wrapper">
+        <input id="input" value="" type="number" placeholder="Введите номер рейса">
+        <input id="submit" type="submit" name="s" value="Поиск">
+    </div>
+    <div class="wrapper">
+        <button id="departure">Вылет</button>
+        <button id="arrival">Прилет</button>
+        <button id="delays">Задержанные рейсы</button>
+    </div>
+    <table id="timeTable">
         <thead>
             <tr>
                 <td>&#8470;</td>
@@ -27,9 +32,10 @@
                 <td>Статус</td>
             </tr>
         </thead>
-        <div id="demo"></div>
+        <tbody class="timeTableInfo">
+        </tbody>
     </table>
-    <button id="delays">Задержанные рейсы</button>
+    <div id="informationTable"></div>
     <table id="delaysTable">
         <thead>
             <tr>
@@ -39,125 +45,12 @@
                 <td>Информация</td>
             </tr>
         </thead>
+        <tbody class="timeTableInfo"></tbody>
     </table>
 </body>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="cities.js"></script>
-
-<script>
-    //var i = "af16f9-d15de2" - another key;
-
-    //for cities in russian
-    function changeToRussianCity(cityCode) {
-        var myJsonCities = JSON.parse(myData);
-        return myJsonCities[cityCode]['name'];
-    }
-
-    //for departure
-    function getDepartures() {
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                var myObj = JSON.parse(this.responseText);
-                $("#departure").click(function() {
-                    var num = 1;
-                    for (var i = 25; i < 50; i++) {
-                        var departureTime = myObj[i].departure.scheduledTime;
-                        departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
-
-                        var arrivalCity = myObj[i].arrival.iataCode;
-                        arrivalCity = changeToRussianCity(arrivalCity);
-                        var airline = myObj[i].airline.name;
-                        var flightNum = myObj[i].flight.iataNumber;
-                        var terminal = myObj[i].departure.terminal;
-                        var status = myObj[i].status;
-                        $("#departureTable").append('<tr><td>' + num + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
-                        num++;
-                    }
-                });
-
-                $("#delays").click(function() {
-                    var num = 1;
-                    for (var i = 70; i < 150; i++) {
-                        var departureTime = myObj[i].departure.scheduledTime;
-                        departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
-                        var arrivalCity = myObj[i].arrival.iataCode;
-                        arrivalCity = changeToRussianCity(arrivalCity);
-                        var flightNum = myObj[i].flight.iataNumber;
-                        var terminal = myObj[i].departure.terminal;
-                        var delay = myObj[i].arrival.delay;
-                        if (delay) {
-                            $("#delaysTable").append('<tr><td>' + num + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>Рейс &#8470; ' + flightNum + ' задержан на ' + delay + ' мин.</td></tr>');
-                            num++;
-                        }
-                    }
-                });
-                //document.getElementById("demo").innerHTML = myObj[5].status;
-            }
-        };
-        xmlhttp.open("GET", "http://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
-        xmlhttp.send();
-
-    }
-
-    getDepartures();
-
-    function getArrivals() {
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                var myObj = JSON.parse(this.responseText);
-                $("#arrival").click(function() {
-                    var num = 1;
-                    for (var i = 25; i < 50; i++) {
-                        var departureTime = myObj[i].departure.scheduledTime;
-                        departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
-
-                        var arrivalCity = myObj[i].arrival.iataCode;
-                        arrivalCity = changeToRussianCity(arrivalCity);
-                        var airline = myObj[i].airline.name;
-                        var flightNum = myObj[i].flight.iataNumber;
-                        var terminal = myObj[i].departure.terminal;
-                        var status = myObj[i].status;
-                        $("#departureTable").append('<tr><td>' + num + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
-                        num++;
-                    }
-                });
-
-                $("#delays").click(function() {
-                    var num = 1;
-                    for (var i = 1; i < 50; i++) {
-                        var departureTime = myObj[i].departure.scheduledTime;
-                        departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
-                        var arrivalCity = myObj[i].arrival.iataCode;
-                        arrivalCity = changeToRussianCity(arrivalCity);
-                        var flightNum = myObj[i].flight.iataNumber;
-                        var terminal = myObj[i].departure.terminal;
-                        var delay = myObj[i].arrival.delay;
-                        if (delay) {
-                            $("#delaysTable").append('<tr><td>' + num + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>Рейс &#8470; ' + flightNum + ' задержан на ' + delay + ' мин.</td></tr>');
-                            num++;
-                        }
-                    }
-                });
-                //document.getElementById("demo").innerHTML = myObj[5].status;
-            }
-        };
-        xmlhttp.open("GET", "http://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=arrival", true);
-        xmlhttp.send();
-
-    }
-    
-    getArrivals()
-
-
-
-
-    /*for API cities in Russian - http://api.travelpayouts.com/data/ru/cities.json*/
-
-
-
-</script>
+<script src="src/cities.js"></script>
+<script src="src/main.js"></script>
 
 </html>
