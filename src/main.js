@@ -177,7 +177,7 @@ $("#departure").click(function () {
         }
     };
 
-    xmlhttp.open("GET", "http://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
+    xmlhttp.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
     xmlhttp.send();
 });
 
@@ -203,7 +203,7 @@ $("#arrival").click(function () {
         }
     };
 
-    xmlhttp.open("GET", "http://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=arrival", true);
+    xmlhttp.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=arrival", true);
     xmlhttp.send();
 });
 
@@ -223,6 +223,6 @@ $("#delays").click(function () {
         }
     };
 
-    xmlhttp.open("GET", "http://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
+    xmlhttp.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
     xmlhttp.send();
 });
