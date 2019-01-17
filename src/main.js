@@ -26,7 +26,7 @@ function statusInRussian(status) {
             status = "Совершил посадку";
             break;
         case "scheduled":
-            status = "Совершил посадку"; //to add time to func getArrival
+            status = "По расписанию"; //to add time to func getArrival
             break;
         case "cancelled":
             status = "Отменен";
@@ -68,17 +68,32 @@ function getFoundFlight(myObj) {
         $("#informationTable").append('<p class="timeTableData">He найдено...<br>Проверьте корректность введенного номера</p>');
     } else {
         $('#timeTable').show();
-        var departureTime = myObj[initNum].departure.scheduledTime;
-        departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
-        var arrivalCity = myObj[initNum].arrival.iataCode;
-        arrivalCity = changeToRussianCity(arrivalCity);
-        var airline = myObj[initNum].airline.name;
-        var flightNum = myObj[initNum].flight.iataNumber;
-        var terminal = myObj[initNum].departure.terminal;
-        terminal = checkTerminal(terminal);
-        var status = myObj[initNum].status;
-        status = statusInRussian(status);
-        $(".timeTableInfo").append('<tr class="timeTableData"><td>' + 1 + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
+        var dirType = myObj[initNum].type;
+        if (dirType == "departure") {
+            var departureTime = myObj[initNum].departure.scheduledTime;
+            departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
+            var arrivalCity = myObj[initNum].arrival.iataCode;
+            arrivalCity = changeToRussianCity(arrivalCity);
+            var airline = myObj[initNum].airline.name;
+            var flightNum = myObj[initNum].flight.iataNumber;
+            var terminal = myObj[initNum].departure.terminal;
+            terminal = checkTerminal(terminal);
+            var status = myObj[initNum].status;
+            status = statusInRussian(status);
+            $(".timeTableInfo").append('<tr class="timeTableData"><td>' + 1 + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
+        } else {
+            var departureTime = myObj[initNum].arrival.scheduledTime;
+            departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
+            var arrivalCity = myObj[initNum].departure.iataCode;
+            arrivalCity = changeToRussianCity(arrivalCity);
+            var airline = myObj[initNum].airline.name;
+            var flightNum = myObj[initNum].flight.iataNumber;
+            var terminal = myObj[initNum].arrival.terminal;
+            terminal = checkTerminal(terminal);
+            var status = myObj[initNum].status;
+            status = statusInRussian(status);
+            $(".timeTableInfo").append('<tr class="timeTableData"><td>' + 1 + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
+        }
     }
 }
 
@@ -154,7 +169,6 @@ $("#departure").click(function () {
             var myObj = JSON.parse(this.responseText);
             getDeparture(myObj, myObj.length - 25, myObj.length);
             $("#submit").click(function () {
-                $('button').removeClass('button-active');
                 $('#timeTable').hide();
                 $("#delaysTable").hide();
                 $('.timeTableData').remove();
@@ -181,7 +195,6 @@ $("#arrival").click(function () {
             var myObj = JSON.parse(this.responseText);
             getArrival(myObj, myObj.length - 25, myObj.length);
             $("#submit").click(function () {
-                $('button').removeClass('button-active');
                 $('#timeTable').hide();
                 $("#delaysTable").hide();
                 $('.timeTableData').remove();
@@ -206,29 +219,10 @@ $("#delays").click(function () {
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var myObj = JSON.parse(this.responseText);
-            getDelays(myObj, myObj.length - 225, myObj.length);
+            getDelays(myObj, myObj.length - 125, myObj.length);
         }
     };
 
     xmlhttp.open("GET", "http://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
     xmlhttp.send();
 });
-
-
-/*$("#submit").click(function () {
-    $('button').removeClass('button-active');
-    $('#timeTable').hide();
-    $("#delaysTable").hide();
-    $('.timeTableData').remove();
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            var myObj = JSON.parse(this.responseText);
-            getFoundFlight(myObj);
-        }
-    };
-
-    xmlhttp.open("GET", "http://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
-    xmlhttp.send();
-});
-*/
