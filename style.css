@@ -21,6 +21,10 @@ p {
     font-size: 28px;
 }
 
+.todayDate {
+    display: block;
+}
+
 #input {
     background-image: url(img/icon-search.svg);
     background-repeat: no-repeat;

@@ -2,10 +2,19 @@
 
 /*for API cities in Russian - http://api.travelpayouts.com/data/ru/cities.json*/
 //function for cities in russian
+
+function getTodayDate() {
+    var todayDate = document.querySelector('.todayDate');
+    var date = new Date();
+    todayDate.innerHTML = 'Сегодня: ' + date.toLocaleDateString('ru-RU');
+}
+
+getTodayDate();
+
 function changeToRussianCity(cityCode) {
     var myJsonCities = JSON.parse(myData);
     if (myJsonCities.hasOwnProperty(cityCode)) {
-        return myJsonCities[cityCode]['name'];
+        return myJsonCities[cityCode];
     } else {
         return cityCode;
     }
@@ -167,7 +176,7 @@ $("#departure").click(function () {
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var myObj = JSON.parse(this.responseText);
-            getDeparture(myObj, myObj.length - 25, myObj.length);
+            getDeparture(myObj, 0, myObj.length);
             $("#submit").click(function () {
                 $('#timeTable').hide();
                 $("#delaysTable").hide();
@@ -193,7 +202,7 @@ $("#arrival").click(function () {
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var myObj = JSON.parse(this.responseText);
-            getArrival(myObj, myObj.length - 25, myObj.length);
+            getArrival(myObj, 0, myObj.length);
             $("#submit").click(function () {
                 $('#timeTable').hide();
                 $("#delaysTable").hide();
@@ -219,10 +228,12 @@ $("#delays").click(function () {
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var myObj = JSON.parse(this.responseText);
-            getDelays(myObj, myObj.length - 125, myObj.length);
+            getDelays(myObj, 0, myObj.length);
         }
     };
 
     xmlhttp.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
     xmlhttp.send();
 });
+
+

@@ -11,10 +11,19 @@
 <body>
     <h1>Аэропорт Шереметьево</h1>
     <h2>Табло рейсов</h2>
+    <span class="todayDate"></span>
     <div class="wrapper">
         <input id="input" value="" type="number" placeholder="Введите номер рейса">
         <input id="submit" type="submit" name="s" value="Поиск">
     </div>
+    <select name="cars">
+        <option value="till7">Till 7 a.m</option>
+        <option value="till12">Till 12 a.m</option>
+        <option value="till16">Till 16 a.m</option>
+        <option value="till20">Till 20 a.m.</option>
+        <option value="till24">Til 24 a.m.</option>
+    </select>
+    
     <div class="wrapper">
         <button id="departure">Вылет</button>
         <button id="arrival">Прилет</button>
