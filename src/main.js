@@ -2,12 +2,20 @@
 
 /*for API cities in Russian - http://api.travelpayouts.com/data/ru/cities.json*/
 //function for cities in russian
+var showedTime = new Date();
 
 function getTodayDate() {
     var todayDate = document.querySelector('.todayDate');
     var date = new Date();
-    todayDate.innerHTML = 'Сегодня: ' + date.toLocaleDateString('ru-RU');
+    todayDate.innerHTML = date.toLocaleDateString('ru-RU') + ' ' + date.getHours() + ':' + date.getMinutes();
 }
+
+
+$('select').change(function () {
+    showedTime.setHours(this.value);
+    showedTime.setMinutes(00);
+    console.log(showedTime);
+});
 
 getTodayDate();
 
@@ -172,11 +180,19 @@ $("#departure").click(function () {
     $('#timeTable').show();
     $("#delaysTable").hide();
     $('.timeTableData').remove();
+
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var myObj = JSON.parse(this.responseText);
-            getDeparture(myObj, 0, myObj.length);
+            var initNum = 0;
+            for (let i = 0; i < myObj.length; i++) {
+                if (showedTime < new Date(myObj[i].departure.scheduledTime)) {
+                    initNum = i;
+                    break;
+                }
+            }
+            getDeparture(myObj, initNum, initNum + 25);
             $("#submit").click(function () {
                 $('#timeTable').hide();
                 $("#delaysTable").hide();
@@ -202,7 +218,15 @@ $("#arrival").click(function () {
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var myObj = JSON.parse(this.responseText);
-            getArrival(myObj, 0, myObj.length);
+            var initNum = 0;
+            for (let i = 0; i < myObj.length; i++) {
+                if (showedTime < new Date(myObj[i].arrival.scheduledTime)) {
+                    initNum = i;
+                    break;
+                }
+            }
+
+            getArrival(myObj, initNum, initNum + 25);
             $("#submit").click(function () {
                 $('#timeTable').hide();
                 $("#delaysTable").hide();
@@ -235,5 +259,3 @@ $("#delays").click(function () {
     xmlhttp.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
     xmlhttp.send();
 });
-
-
