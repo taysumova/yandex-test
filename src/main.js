@@ -7,17 +7,21 @@ var showedTime = new Date();
 function getTodayDate() {
     var todayDate = document.querySelector('.todayDate');
     var date = new Date();
-    todayDate.innerHTML = date.toLocaleDateString('ru-RU') + ' ' + date.getHours() + ':' + date.getMinutes();
+    var fullMinutes = date.getMinutes();
+    if (fullMinutes < 10) {
+        fullMinutes = '0' + date.getMinutes();
+    } else {
+        fullMinutes = date.getMinutes();
+    }
+    todayDate.innerHTML = date.toLocaleDateString('ru-RU') + ' ' + date.getHours() + ':' + fullMinutes;
 }
-
+getTodayDate();
 
 $('select').change(function () {
-    showedTime.setHours(this.value);
-    showedTime.setMinutes(00);
-    console.log(showedTime);
+    var selectedTime = this.value;
+    showedTime = new Date();
+    showedTime.setHours(showedTime.getHours() - selectedTime);
 });
-
-getTodayDate();
 
 function changeToRussianCity(cityCode) {
     var myJsonCities = JSON.parse(myData);
@@ -115,8 +119,7 @@ function getFoundFlight(myObj) {
 }
 
 //for departure information
-function getDeparture(myObj, initArg, endArg) {
-    var num = 1;
+function getDeparture(myObj, initArg, endArg, num) {
     var i = initArg;
     for (i; i < endArg; i++) {
         var departureTime = myObj[i].departure.scheduledTime;
@@ -136,8 +139,7 @@ function getDeparture(myObj, initArg, endArg) {
 
 
 //for arrivals - need to be changed
-function getArrival(myObj, initArg, endArg) {
-    var num = 1;
+function getArrival(myObj, initArg, endArg, num) {
     var i = initArg;
     for (i; i < endArg; i++) {
         var arrivalTime = myObj[i].arrival.scheduledTime;
@@ -156,8 +158,7 @@ function getArrival(myObj, initArg, endArg) {
 }
 
 //function for delays - departure
-function getDelays(myObj, initArg, endArg) {
-    var num = 1;
+function getDelays(myObj, initArg, endArg, num) {
     var i = initArg;
     for (i; i < endArg; i++) {
         var departureTime = myObj[i].departure.scheduledTime;
@@ -179,26 +180,40 @@ $("#departure").click(function () {
     $("#departure").addClass('button-active');
     $('#timeTable').show();
     $("#delaysTable").hide();
+    $('#load-more').show();
     $('.timeTableData').remove();
+    var num = 1;
+    var initNum = 0;
 
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var myObj = JSON.parse(this.responseText);
-            var initNum = 0;
             for (let i = 0; i < myObj.length; i++) {
                 if (showedTime < new Date(myObj[i].departure.scheduledTime)) {
                     initNum = i;
                     break;
                 }
             }
-            getDeparture(myObj, initNum, initNum + 25);
+            getDeparture(myObj, initNum, initNum + 50, num);
             $("#submit").click(function () {
                 $('#timeTable').hide();
                 $("#delaysTable").hide();
                 $('.timeTableData').remove();
                 getFoundFlight(myObj);
             });
+            /*$('#load-more').click(function () {
+                initNum += 25;
+                getDeparture(myObj, initNum, initNum + 25, num += 25);
+                $('#arrival').click(function () {
+                    num = 1;
+                    initNum = 0;
+                });
+                $('#delays').click(function () {
+                    num = 1;
+                    initNum = 0;
+                });
+            })*/
         }
     };
 
@@ -213,12 +228,14 @@ $("#arrival").click(function () {
     $("#arrival").addClass('button-active');
     $('#timeTable').show();
     $('#delaysTable').hide();
+    $('#load-more').show();
     $('.timeTableData').remove();
+    var num = 1;
+    var initNum = 0;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var myObj = JSON.parse(this.responseText);
-            var initNum = 0;
             for (let i = 0; i < myObj.length; i++) {
                 if (showedTime < new Date(myObj[i].arrival.scheduledTime)) {
                     initNum = i;
@@ -226,13 +243,25 @@ $("#arrival").click(function () {
                 }
             }
 
-            getArrival(myObj, initNum, initNum + 25);
+            getArrival(myObj, initNum, initNum + 50, num);
             $("#submit").click(function () {
                 $('#timeTable').hide();
                 $("#delaysTable").hide();
                 $('.timeTableData').remove();
                 getFoundFlight(myObj);
             });
+            /*$('#load-more').click(function () {
+                initNum += 25;
+                getArrival(myObj, initNum, initNum + 25, num += 25);
+                $('#departure').click(function () {
+                    num = 1;
+                    initNum = 0;
+                });
+                $('#delays').click(function () {
+                    num = 1;
+                    initNum = 0;
+                });
+            })*/
         }
     };
 
@@ -247,12 +276,33 @@ $("#delays").click(function () {
     $("#delays").addClass('button-active');
     $('#delaysTable').show();
     $('#timeTable').hide();
+    $('#load-more').hide();
     $('.timeTableData').remove();
+    var num = 1;
+    var initNum = 0;
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var myObj = JSON.parse(this.responseText);
-            getDelays(myObj, 0, myObj.length);
+            /*for (let i = 0; i < myObj.length; i++) {
+                if (showedTime < new Date(myObj[i].arrival.scheduledTime)) {
+                    initNum = i;
+                    break;
+                }
+            }*/
+            getDelays(myObj, initNum, myObj.length, num);
+            /*$('#load-more').click(function () {
+                initNum += 25;
+                getDelays(myObj, initNum, initNum + 100, num += 100);
+                $('#arrival').click(function () {
+                    num = 1;
+                    initNum = 0;
+                });
+                $('#departure').click(function () {
+                    num = 1;
+                    initNum = 0;
+                });
+            })*/
         }
     };
 

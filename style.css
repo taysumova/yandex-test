@@ -12,13 +12,15 @@ h1,
 h2,
 p {
     font-family: monospace;
-    font-style: italic;
     color: midnightblue;
 }
 
+h1 {
+    font-size: 30px;
+}
 
 p {
-    font-size: 28px;
+    font-size: 26px;
 }
 
 .todayDate {
@@ -83,7 +85,8 @@ table {
 }
 
 #timeTable,
-#delaysTable {
+#delaysTable,
+#load-more {
     display: none;
 }
 
