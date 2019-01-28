@@ -1,311 +1,276 @@
-//var i = "af16f9-d15de2" - another key in case if below one will exceed its limit;
+document.addEventListener('DOMContentLoaded', function () {
+    //"af16f9-d15de2" - another key in case if below one will exceed its limit;
+    //for API cities in Russian - http://api.travelpayouts.com/data/ru/cities.json
+    
+    //глобальные переменные
+    let departureObj = {},
+        arrivalObj = {},
+        showedTime = new Date();
 
-/*for API cities in Russian - http://api.travelpayouts.com/data/ru/cities.json*/
-//function for cities in russian
-var showedTime = new Date();
-
-function getTodayDate() {
-    var todayDate = document.querySelector('.todayDate');
-    var date = new Date();
-    var fullMinutes = date.getMinutes();
-    if (fullMinutes < 10) {
-        fullMinutes = '0' + date.getMinutes();
-    } else {
-        fullMinutes = date.getMinutes();
-    }
-    todayDate.innerHTML = date.toLocaleDateString('ru-RU') + ' ' + date.getHours() + ':' + fullMinutes;
-}
-getTodayDate();
-
-$('select').change(function () {
-    var selectedTime = this.value;
-    showedTime = new Date();
-    showedTime.setHours(showedTime.getHours() - selectedTime);
-});
-
-function changeToRussianCity(cityCode) {
-    var myJsonCities = JSON.parse(myData);
-    if (myJsonCities.hasOwnProperty(cityCode)) {
-        return myJsonCities[cityCode];
-    } else {
-        return cityCode;
-    }
-
-}
-
-function checkTerminal(terminal) {
-    if (!terminal) {
-        return terminal = "—";
-    } else {
-        return terminal;
-    }
-}
-
-function statusInRussian(status) {
-    switch (status) {
-        case "landed":
-            status = "Совершил посадку";
-            break;
-        case "scheduled":
-            status = "По расписанию"; //to add time to func getArrival
-            break;
-        case "cancelled":
-            status = "Отменен";
-            break;
-        case "active":
-            status = "В полете";
-            break;
-        case "incident":
-            status = "Инцидент/авария";
-            break;
-        case "diverted":
-            status = "Отменен";
-            break;
-        case "redirected":
-            status = "Перенаправлен";
-            break;
-        case "unknown":
-            status = "Неизвестен";
-            break;
-    }
-    return status;
-}
-
-function searchFlight(myObj, inputFlightNum) {
-    for (var i = 0; i < myObj.length; i++) {
-        var flightNum = myObj[i].flight.number;
-        if (inputFlightNum == flightNum) {
-            return i;
+    //получаем JSON объект из API - departure
+    var departureReq = new XMLHttpRequest();
+    departureReq.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            departureObj = JSON.parse(this.responseText);
         }
-    }
-    return 0;
-}
+    };
 
-function getFoundFlight(myObj) {
-    var inputFlightNum = document.getElementById("input");
-    var inputFlightNum = inputFlightNum.value;
-    var initNum = searchFlight(myObj, inputFlightNum);
-    if (!initNum) {
-        $("#informationTable").append('<p class="timeTableData">He найдено...<br>Проверьте корректность введенного номера</p>');
-    } else {
-        $('#timeTable').show();
-        var dirType = myObj[initNum].type;
-        if (dirType == "departure") {
-            var departureTime = myObj[initNum].departure.scheduledTime;
-            departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
-            var arrivalCity = myObj[initNum].arrival.iataCode;
-            arrivalCity = changeToRussianCity(arrivalCity);
-            var airline = myObj[initNum].airline.name;
-            var flightNum = myObj[initNum].flight.iataNumber;
-            var terminal = myObj[initNum].departure.terminal;
-            terminal = checkTerminal(terminal);
-            var status = myObj[initNum].status;
-            status = statusInRussian(status);
-            $(".timeTableInfo").append('<tr class="timeTableData"><td>' + 1 + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
+    departureReq.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
+    departureReq.send();
+
+
+    //получаем JSON объект из API - arrival
+    var arrivalReq = new XMLHttpRequest();
+    arrivalReq.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            arrivalObj = JSON.parse(this.responseText);
+        }
+    };
+
+    arrivalReq.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=arrival", true);
+    arrivalReq.send();
+
+    function getTodayDate() {
+        let todayDate = document.querySelector('.todayDate'),
+            date = new Date(),
+            fullMinutes = date.getMinutes();
+
+        if (fullMinutes < 10) {
+            fullMinutes = '0' + date.getMinutes();
         } else {
-            var departureTime = myObj[initNum].arrival.scheduledTime;
-            departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
-            var arrivalCity = myObj[initNum].departure.iataCode;
-            arrivalCity = changeToRussianCity(arrivalCity);
-            var airline = myObj[initNum].airline.name;
-            var flightNum = myObj[initNum].flight.iataNumber;
-            var terminal = myObj[initNum].arrival.terminal;
-            terminal = checkTerminal(terminal);
-            var status = myObj[initNum].status;
-            status = statusInRussian(status);
-            $(".timeTableInfo").append('<tr class="timeTableData"><td>' + 1 + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
+            fullMinutes = date.getMinutes();
+        }
+
+        todayDate.innerHTML = date.toLocaleDateString('ru-RU') + ' ' + date.getHours() + ':' + fullMinutes;
+    }
+
+    getTodayDate();
+    setInterval(getTodayDate, 1000 * 30);
+
+    //функция для перевода городов на русский язык
+    function changeToRussianCity(cityCode) {
+        var myJsonCities = JSON.parse(myData); // внешний файл js - cities.js
+        if (myJsonCities.hasOwnProperty(cityCode)) {
+            return myJsonCities[cityCode];
+        } else {
+            return cityCode;
+        }
+
+    }
+
+    function checkTerminal(terminal) {
+        if (!terminal) {
+            return terminal = "—";
+        } else {
+            return terminal;
         }
     }
-}
 
-//for departure information
-function getDeparture(myObj, initArg, endArg, num) {
-    var i = initArg;
-    for (i; i < endArg; i++) {
-        var departureTime = myObj[i].departure.scheduledTime;
-        departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
-        var arrivalCity = myObj[i].arrival.iataCode;
-        arrivalCity = changeToRussianCity(arrivalCity);
-        var airline = myObj[i].airline.name;
-        var flightNum = myObj[i].flight.iataNumber;
-        var terminal = myObj[i].departure.terminal;
-        terminal = checkTerminal(terminal);
-        var status = myObj[i].status;
-        status = statusInRussian(status);
-        $(".timeTableInfo").append('<tr class="timeTableData"><td>' + num + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
-        num++;
+    function statusInRussian(status) {
+        switch (status) {
+            case "landed":
+                status = "Совершил посадку";
+                break;
+            case "scheduled":
+                status = "По расписанию";
+                break;
+            case "cancelled":
+                status = "Отменен";
+                break;
+            case "active":
+                status = "В полете";
+                break;
+            case "incident":
+                status = "Инцидент/авария";
+                break;
+            case "diverted":
+                status = "Отменен";
+                break;
+            case "redirected":
+                status = "Перенаправлен";
+                break;
+            case "unknown":
+                status = "Неизвестен";
+                break;
+        }
+        return status;
     }
-}
 
 
-//for arrivals - need to be changed
-function getArrival(myObj, initArg, endArg, num) {
-    var i = initArg;
-    for (i; i < endArg; i++) {
-        var arrivalTime = myObj[i].arrival.scheduledTime;
-        arrivalTime = arrivalTime[11] + arrivalTime[12] + arrivalTime[13] + arrivalTime[14] + arrivalTime[15];
-        var departureCity = myObj[i].departure.iataCode;
-        departureCity = changeToRussianCity(departureCity);
-        var airline = myObj[i].airline.name;
-        var flightNum = myObj[i].flight.iataNumber;
-        var terminal = myObj[i].arrival.terminal;
-        terminal = checkTerminal(terminal);
-        var status = myObj[i].status;
-        status = statusInRussian(status);
-        $(".timeTableInfo").append('<tr class="timeTableData"><td>' + num + '</td><td>' + arrivalTime + '</td><td>' + departureCity + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
-        num++;
+    function searchFlight(searchFlightNum) {
+        for (let i = 0; i < departureObj.length; i++) {
+            let flightNum = departureObj[i].flight.number;
+            if (searchFlightNum == flightNum) {
+                return {
+                    dirType: "departure",
+                    num: i
+                };
+            }
+        }
+
+        for (let i = 0; i < arrivalObj.length; i++) {
+            let flightNum = arrivalObj[i].flight.number;
+            if (searchFlightNum == flightNum) {
+                return {
+                    dirType: "arrival",
+                    num: i
+                };
+            }
+        }
+
+        return 0;
     }
-}
 
-//function for delays - departure
-function getDelays(myObj, initArg, endArg, num) {
-    var i = initArg;
-    for (i; i < endArg; i++) {
-        var departureTime = myObj[i].departure.scheduledTime;
-        departureTime = departureTime[11] + departureTime[12] + departureTime[13] + departureTime[14] + departureTime[15];
-        var arrivalCity = myObj[i].arrival.iataCode;
-        arrivalCity = changeToRussianCity(arrivalCity);
-        var flightNum = myObj[i].flight.iataNumber;
-        var delay = myObj[i].arrival.delay;
-        if (delay) {
-            $(".timeTableInfo").append('<tr class="timeTableData"><td>' + num + '</td><td>' + departureTime + '</td><td>' + arrivalCity + '</td><td>Вылет рейса &#8470; ' + flightNum + ' задержан на ' + delay + ' мин.</td></tr>');
+    function getFoundFlight() {
+        let inputFlightNum = document.getElementById("input");
+        inputFlightNum = inputFlightNum.value;
+        let flightObj = searchFlight(inputFlightNum),
+            initNum = flightObj.num;
+        if (!initNum) {
+            $("#informationTable").append('<p class="timeTableData">He найдено...<br>Проверьте корректность введенного номера</p>');
+        } else {
+            $('#timeTable').show();
+            let dirType = flightObj.dirType;
+            if (dirType == "departure") {
+                $('button').removeClass('button-active');
+                $("#departure").addClass('button-active');
+                getDeparture(initNum, initNum + 1, 1);
+            } else {
+                $('button').removeClass('button-active');
+                $("#arrival").addClass('button-active');
+                getArrival(initNum, initNum + 1, 1);
+            }
+        }
+    }
+
+    //получение информации по отправлению из JSON и добавление в таблицу
+    function getDeparture(initArg, endArg, num) {
+        for (let i = initArg; i < endArg; i++) {
+            let time = departureObj[i].departure.scheduledTime,
+                city = departureObj[i].arrival.iataCode,
+                airline = departureObj[i].airline.name,
+                flightNum = departureObj[i].flight.iataNumber,
+                terminal = departureObj[i].departure.terminal,
+                status = departureObj[i].status;
+
+            time = time[11] + time[12] + time[13] + time[14] + time[15];
+            city = changeToRussianCity(city);
+            terminal = checkTerminal(terminal);
+            status = statusInRussian(status);
+
+            $(".timeTableInfo").append('<tr class="timeTableData"><td>' + num + '</td><td>' + time + '</td><td>' + city + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
             num++;
         }
     }
-}
 
-//calling the departure list with departure button
-$("#departure").click(function () {
-    $('button').removeClass('button-active');
-    $("#departure").addClass('button-active');
-    $('#timeTable').show();
-    $("#delaysTable").hide();
-    $('#load-more').show();
-    $('.timeTableData').remove();
-    var num = 1;
-    var initNum = 0;
+    //получение информации по прибытию из JSON и добавление в таблицу
+    function getArrival(initArg, endArg, num) {
+        for (let i = initArg; i < endArg; i++) {
+            let time = arrivalObj[i].arrival.scheduledTime,
+                city = arrivalObj[i].departure.iataCode,
+                airline = arrivalObj[i].airline.name,
+                flightNum = arrivalObj[i].flight.iataNumber,
+                terminal = arrivalObj[i].arrival.terminal,
+                status = arrivalObj[i].status;
 
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            var myObj = JSON.parse(this.responseText);
-            for (let i = 0; i < myObj.length; i++) {
-                if (showedTime < new Date(myObj[i].departure.scheduledTime)) {
-                    initNum = i;
-                    break;
-                }
+            time = time[11] + time[12] + time[13] + time[14] + time[15];
+            city = changeToRussianCity(city);
+            terminal = checkTerminal(terminal);
+            status = statusInRussian(status);
+
+            $(".timeTableInfo").append('<tr class="timeTableData"><td>' + num + '</td><td>' + time + '</td><td>' + city + '</td><td>' + airline + '</td><td>' + flightNum + '</td><td>' + terminal + '</td><td>' + status + '</td></tr>');
+            num++;
+        }
+    }
+
+    //получение задержанных рейсов - только вылет
+    function getDelays(initArg, endArg, num) {
+        for (let i = initArg; i < endArg; i++) {
+            let time = departureObj[i].departure.scheduledTime,
+                city = departureObj[i].arrival.iataCode,
+                flightNum = departureObj[i].flight.iataNumber,
+                delay = departureObj[i].arrival.delay;
+
+            time = time[11] + time[12] + time[13] + time[14] + time[15];
+            city = changeToRussianCity(city);
+
+            if (delay) {
+                $(".timeTableInfo").append('<tr class="timeTableData"><td>' + num + '</td><td>' + time + '</td><td>' + city + '</td><td>Вылет рейса &#8470; ' + flightNum + ' задержан на ' + delay + ' мин.</td></tr>');
+                num++;
             }
-            getDeparture(myObj, initNum, initNum + 50, num);
-            $("#submit").click(function () {
-                $('#timeTable').hide();
-                $("#delaysTable").hide();
-                $('.timeTableData').remove();
-                getFoundFlight(myObj);
-            });
-            /*$('#load-more').click(function () {
-                initNum += 25;
-                getDeparture(myObj, initNum, initNum + 25, num += 25);
-                $('#arrival').click(function () {
-                    num = 1;
-                    initNum = 0;
-                });
-                $('#delays').click(function () {
-                    num = 1;
-                    initNum = 0;
-                });
-            })*/
         }
-    };
+    }
 
-    xmlhttp.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
-    xmlhttp.send();
-});
+    $('select').change(function () {
+        let selectedTime = this.value;
+        showedTime = new Date();
+        showedTime.setHours(showedTime.getHours() - selectedTime);
+    });
+
+    $("#submit").click(function () {
+        $('#timeTable').hide();
+        $("#delaysTable").hide();
+        $('.timeTableData').remove();
+        getFoundFlight();
+    });
 
 
-//calling the arrival list with arrival button
-$("#arrival").click(function () {
-    $('button').removeClass('button-active');
-    $("#arrival").addClass('button-active');
-    $('#timeTable').show();
-    $('#delaysTable').hide();
-    $('#load-more').show();
-    $('.timeTableData').remove();
-    var num = 1;
-    var initNum = 0;
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            var myObj = JSON.parse(this.responseText);
-            for (let i = 0; i < myObj.length; i++) {
-                if (showedTime < new Date(myObj[i].arrival.scheduledTime)) {
-                    initNum = i;
-                    break;
-                }
+    $("#departure").click(function () {
+        $('button').removeClass('button-active');
+        $("#departure").addClass('button-active');
+        $('#timeTable').show();
+        $("#delaysTable").hide();
+        $('.timeTableData').remove();
+        let num = 1,
+            initNum = 0;
+
+        for (let i = 0; i < departureObj.length; i++) {
+            if (showedTime < new Date(departureObj[i].departure.scheduledTime)) {
+                initNum = i;
+                break;
             }
-
-            getArrival(myObj, initNum, initNum + 50, num);
-            $("#submit").click(function () {
-                $('#timeTable').hide();
-                $("#delaysTable").hide();
-                $('.timeTableData').remove();
-                getFoundFlight(myObj);
-            });
-            /*$('#load-more').click(function () {
-                initNum += 25;
-                getArrival(myObj, initNum, initNum + 25, num += 25);
-                $('#departure').click(function () {
-                    num = 1;
-                    initNum = 0;
-                });
-                $('#delays').click(function () {
-                    num = 1;
-                    initNum = 0;
-                });
-            })*/
         }
-    };
-
-    xmlhttp.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=arrival", true);
-    xmlhttp.send();
-});
+        getDeparture(initNum, departureObj.length, num);
+    });
 
 
-//calling the delays list with delay button
-$("#delays").click(function () {
-    $('button').removeClass('button-active');
-    $("#delays").addClass('button-active');
-    $('#delaysTable').show();
-    $('#timeTable').hide();
-    $('#load-more').hide();
-    $('.timeTableData').remove();
-    var num = 1;
-    var initNum = 0;
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            var myObj = JSON.parse(this.responseText);
-            /*for (let i = 0; i < myObj.length; i++) {
-                if (showedTime < new Date(myObj[i].arrival.scheduledTime)) {
-                    initNum = i;
-                    break;
-                }
-            }*/
-            getDelays(myObj, initNum, myObj.length, num);
-            /*$('#load-more').click(function () {
-                initNum += 25;
-                getDelays(myObj, initNum, initNum + 100, num += 100);
-                $('#arrival').click(function () {
-                    num = 1;
-                    initNum = 0;
-                });
-                $('#departure').click(function () {
-                    num = 1;
-                    initNum = 0;
-                });
-            })*/
+    $("#arrival").click(function () {
+        $('button').removeClass('button-active');
+        $("#arrival").addClass('button-active');
+        $('#timeTable').show();
+        $('#delaysTable').hide();
+        $('.timeTableData').remove();
+
+        let num = 1,
+            initNum = 0;
+
+        for (let i = 0; i < arrivalObj.length; i++) {
+            if (showedTime < new Date(arrivalObj[i].arrival.scheduledTime)) {
+                initNum = i;
+                break;
+            }
         }
-    };
 
-    xmlhttp.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
-    xmlhttp.send();
+        getArrival(initNum, arrivalObj.length, num);
+    });
+
+
+    $("#delays").click(function () {
+        $('button').removeClass('button-active');
+        $("#delays").addClass('button-active');
+        $('#delaysTable').show();
+        $('#timeTable').hide();
+        $('#load-more').hide();
+        $('.timeTableData').remove();
+        let num = 1,
+            initNum = 0;
+        for (let i = 0; i < departureObj.length; i++) {
+            if (showedTime < new Date(departureObj[i].departure.scheduledTime)) {
+                initNum = i;
+                break;
+            }
+        }
+        getDelays(initNum, departureObj.length, num);
+
+    });
 });
