@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    //"af16f9-d15de2" - another key in case if below one will exceed its limit;
     //for API cities in Russian - http://api.travelpayouts.com/data/ru/cities.json
     
     //глобальные переменные
@@ -15,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    departureReq.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=departure", true);
+    departureReq.open("GET", "https://aviation-edge.com/v2/public/timetable?key=af16f9-d15de2&iataCode=SVO&type=departure", true);
     departureReq.send();
 
 
@@ -27,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    arrivalReq.open("GET", "https://aviation-edge.com/v2/public/timetable?key=f25965-b40571&iataCode=SVO&type=arrival", true);
+    arrivalReq.open("GET", "https://aviation-edge.com/v2/public/timetable?key=af16f9-d15de2&iataCode=SVO&type=arrival", true);
     arrivalReq.send();
 
     function getTodayDate() {
